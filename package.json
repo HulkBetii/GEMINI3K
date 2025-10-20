@@ -1,14 +1,18 @@
 {
   "name": "tg-opener",
+  "version": "1.0.0",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "pack:win": "electron-packager . GEMINI3K --platform=win32 --arch=x64 --out dist --overwrite --asar --app-version=%npm_package_version%",
+    "icon": "node build/generate-icon.js",
+    "pack:win": "npm run icon && electron-packager . GEMINI3K --platform=win32 --arch=x64 --out dist --overwrite --asar --app-version=1.0.0 --icon=build/icon.ico",
     "pack:win:dir": "electron-packager . GEMINI3K --platform=win32 --arch=x64 --out dist --overwrite",
-    "innosetup:hint": "echo 'Open build/installer.iss in Inno Setup on Windows to build GEMINI3K-Seup.exe'"
+    "innosetup:hint": "echo 'Open build/installer.iss in Inno Setup on Windows to build GEMINI3K-Setup.exe'"
   },
   "devDependencies": {
     "electron": "^28.0.0",
-    "electron-packager": "^17.1.2"
+    "electron-packager": "^17.1.2",
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.4"
   }
 }
