@@ -44,30 +44,64 @@ app.on('activate', () => {
   }
 });
 
+// Utility: validate Telegram username (5-32 chars, letters, numbers, underscore)
+function isValidTelegramUsername(name) {
+  if (typeof name !== 'string') return false;
+  const trimmed = name.trim();
+  if (trimmed.startsWith('@')) {
+    return /^[A-Za-z0-9_]{5,32}$/.test(trimmed.slice(1));
+  }
+  return /^[A-Za-z0-9_]{5,32}$/.test(trimmed);
+}
+
+// Utility: open external URL with timeout protection
+async function openExternalWithTimeout(url, timeoutMs = 10000) {
+  return await Promise.race([
+    shell.openExternal(url),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')),
+      Math.max(1000, timeoutMs)))
+  ]);
+}
+
 // IPC handler for opening Telegram links
-ipcMain.handle('open-telegram', async (event, domain) => {
-  let tgError = null;
-  let webError = null;
-  
-  // First try: tg:// protocol
+ipcMain.handle('open-telegram', async (event, rawDomain) => {
   try {
-    await shell.openExternal(`tg://resolve?domain=${domain}`);
-    return { ok: true, method: 'tg' };
-  } catch (error) {
-    tgError = error;
-    console.log('tg:// protocol failed, trying web fallback:', error.message);
+    // Ensure app is ready
+    if (!app || !app.isReady()) {
+      return { ok: false, error: 'app-not-ready' };
+    }
+
+    // Resolve and validate domain
+    const domainInput = typeof rawDomain === 'string' ? rawDomain.trim() : '';
+    const domain = domainInput || 'sheeridverify_bot';
+
+    if (!isValidTelegramUsername(domain)) {
+      return { ok: false, error: 'invalid-domain' };
+    }
+
+    // Attempt tg:// first with timeout
+    try {
+      await openExternalWithTimeout(`tg://resolve?domain=${domain}`, 10000);
+      return { ok: true, method: 'tg' };
+    } catch (tgErr) {
+      // Fall back to web even on timeout or error
+      try {
+        await openExternalWithTimeout(`https://t.me/${domain}`, 10000);
+        return { ok: true, method: 'web' };
+      } catch (webErr) {
+        // Both failed
+        return {
+          ok: false,
+          error: 'no-handler-succeeded',
+          details: {
+            tg: tgErr && (tgErr.message || String(tgErr)),
+            web: webErr && (webErr.message || String(webErr))
+          }
+        };
+      }
+    }
+  } catch (unhandled) {
+    // Last-resort catch-all
+    return { ok: false, error: 'unhandled-main-error', message: (unhandled && unhandled.message) || String(unhandled) };
   }
-  
-  // Second try: web fallback
-  try {
-    await shell.openExternal(`https://t.me/${domain}`);
-    return { ok: true, method: 'web' };
-  } catch (error) {
-    webError = error;
-    console.error('Web fallback also failed:', error.message);
-  }
-  
-  // Both methods failed
-  console.error('Both tg:// and web methods failed');
-  return { ok: false, error: 'no-handler-succeeded' };
 });

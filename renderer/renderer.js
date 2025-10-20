@@ -509,7 +509,10 @@ document.addEventListener('visibilitychange', () => {
 function handleDownloadClick() {
     try {
         // Open Telegram download page in browser
-        window.open('https://telegram.org/apps', '_blank');
+        const winRef = window.open('https://desktop.telegram.org/', '_blank');
+        if (!winRef) {
+            throw new Error('WINDOW_OPEN_BLOCKED');
+        }
         showMessage(getLogText('downloadSuccess'), 'success', 3000);
     } catch (error) {
         console.error('Lỗi mở trang tải:', error);
