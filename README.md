@@ -95,6 +95,35 @@ GEMINI3K/
 - `npm start` - Run the application
 - `npm run dev` - Run with development tools (if configured)
 
+### Windows Build and Installer (Inno Setup)
+
+These steps are for Windows.
+
+1) Install prerequisites:
+- Node.js 18+
+- Git for Windows
+- Inno Setup (download from `https://jrsoftware.org/isinfo.php`)
+
+2) Install project dependencies:
+```bash
+npm install
+```
+
+3) Package the Electron app (creates dist/GEMINI3K-win32-x64):
+```bash
+npm run pack:win
+```
+
+4) Build the installer using Inno Setup:
+- Open `build/installer.iss` in Inno Setup Compiler
+- Press Build → Compile
+- Output will be an installer named `GEMINI3K-Seup.exe`
+
+If you prefer a directory-only packaging without asar or custom options:
+```bash
+npm run pack:win:dir
+```
+
 ### Language API
 The application exposes a global language API for console access:
 ```javascript
