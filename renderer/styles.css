@@ -39,7 +39,7 @@ body {
 }
 
 .title {
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800;
     background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
     background-size: 400% 400%;
@@ -100,7 +100,7 @@ body {
 }
 
 .hero-title {
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-size: clamp(2.2rem, 3.2vw, 3.2rem);
     font-weight: 700;
     color: #ffffff;
     margin-bottom: 1rem;
@@ -111,7 +111,7 @@ body {
 }
 
 .hero-description {
-    font-size: clamp(1rem, 2vw, 1.1rem);
+    font-size: clamp(1.2rem, 2.2vw, 1.3rem);
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 2rem;
     line-height: 1.6;
